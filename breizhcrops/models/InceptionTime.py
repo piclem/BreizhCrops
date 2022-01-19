@@ -18,7 +18,7 @@ class InceptionTime(nn.Module):
         for i in range(num_layers-1):
           self.inception_modules_list.append(InceptionModule(input_dim = hidden_dims, kernel_size=40, num_filters=hidden_dims//4,
                                                        use_bias=use_bias, device=device))
-        self.shortcut_layer_list = [ShortcutLayer(input_dim,hidden_dims,stride = 1, bias = False)]
+        self.shortcut_layer_list = [ShortcutLayer(input_dim,hidden_dims,stride = 1, bias = False, device=device)]
         for i in range(num_layers//3):
           self.shortcut_layer_list.append(ShortcutLayer(hidden_dims,hidden_dims,stride = 1, bias = False))
         self.avgpool = nn.AdaptiveAvgPool1d(1)
@@ -79,7 +79,7 @@ class InceptionModule(nn.Module):
         return features
 
 class ShortcutLayer(nn.Module):
-    def __init__(self, in_planes, out_planes, stride, bias):
+    def __init__(self, in_planes, out_planes, stride, bias, device=torch.device("cpu")):
         super(ShortcutLayer, self).__init__()
         self.sc = nn.Sequential(nn.Conv1d(in_channels=in_planes,
                                           out_channels=out_planes,
@@ -88,6 +88,7 @@ class ShortcutLayer(nn.Module):
                                           bias=bias),
                                 nn.BatchNorm1d(num_features=out_planes))
         self.relu = nn.ReLU()
+        self.to(device)
 
     def forward(self, input_tensor, out_tensor):
         x = out_tensor + self.sc(input_tensor)
