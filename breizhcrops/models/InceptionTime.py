@@ -86,7 +86,7 @@ class ShortcutLayer(nn.Module):
                                           kernel_size=1,
                                           stride=stride,
                                           bias=bias),
-                                nn.BatchNorm1d(num_features=out_planes))
+                                nn.BatchNorm1d(num_features=out_planes)).to(device)
         self.relu = nn.ReLU()
         self.to(device)
 
